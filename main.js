@@ -48,26 +48,28 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.2;
 
 const modelcontent = {
-      "Project_1_2":{
-          title: "Project One",
-          content: "This is a sample. This is a sample. This is a sample. This is a sample. This is a sample.",
-          link: "https://github.com/Phoenix-610",
-      },
-      "Project_2_2":{
-          title: "Project Two",
-          content: "This is a sample. This is a sample. This is a sample. This is a sample. This is a sample.",
-          link: "https://github.com/Phoenix-610",
-      },
-      "Project_3_2":{
-          title: "Project Three",
-          content: "This is a sample. This is a sample. This is a sample. This is a sample. This is a sample.",
-          link: "https://github.com/Phoenix-610",
-      },
-      "Phoenix":{
-            title: "About Me",
-            content: "This is a sample. This is a sample. This is a sample. This is a sample. This is a sample.",
-      },
+    "Project_1_2": {
+        title: "Hospital Management System",
+        content: "A full-featured web-based Hospital Management System designed to streamline 📝 patient registration, 🧑‍⚕️ doctor scheduling, 📁 medical records, and 🧾 inventory. Built with a responsive UI and robust backend to support multi-role access for administrators, doctors, and staff. Focused on reliability and usability in real-world healthcare scenarios.",
+        link: "https://github.com/Phoenix-610/HMIS",
+    },
+    "Project_2_2": {
+        title: "Bus Management System",
+        content: "This project automates the management of 🚍 buses, 👨‍✈️ drivers, 📍 routes, and 🎟️ bookings in a transport system. It provides role-based dashboards for admins and operators, along with route optimization logic and real-time seat availability tracking. Built to scale for both urban 🏙️ and intercity 🌆 environments.",
+        link: "https://github.com/Phoenix-610/Bus-Management-System",
+    },
+    "Project_3_2": {
+        title: "RideX: Ride Booking App",
+        content: "RideX is a modern ride-hailing web app inspired by Uber/Ola. It enables users to 🧍‍♂️ book rides in real time, 🧭 track drivers on a live map, and 📜 manage trip history. The platform features a clean, intuitive interface and is powered by 📡 geolocation APIs, 🔐 secure authentication, and scalable architecture for both riders and drivers.",
+        link: "https://github.com/Phoenix-610",
+    },
+    "Phoenix": {
+        title: "About Me",
+        content: "Hey! I'm Tarun Kumar, a passionate technologist with a love for all things 3D 🧊 and code 💻. I enjoy crafting immersive web experiences using technologies like Three.js, and I have solid skills in C++, JavaScript, Python, and full-stack frameworks. Whether it's building interactive UIs 🎨 or experimenting with motion and 3D scenes 🚀, I thrive at the intersection of creativity and technology. Outside the digital world, you’ll find me 🎸 strumming my guitar or exploring the latest tech trends 📱. I believe in constant learning, meaningful design, and creating things that inspire 🌟.",
+    },
 };
+
+
 
 const model = document.querySelector(".model");
 const modelTitle = document.querySelector(".model-title");
