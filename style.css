@@ -3,7 +3,26 @@
     margin: 0;
     box-sizing: border-box;
     font-family: "Saiyan Sans", sans-serif;
+    /* font-family: "Pixelify Sans", sans-serif; */
+     /* font-family: "Product Sans", sans-serif; */
 }
+
+
+
+
+:root {
+  --pastel-pink: #ad8671;
+  --pastel-blue: #717dad;
+}
+
+.light-theme {
+  --default-bg: var(--pastel-pink);
+}
+
+.dark-theme {
+  --default-bg: var(--pastel-blue);
+}
+
 
 /* Experience */
 #experience{
@@ -25,7 +44,85 @@
     display: none !important;
 }
 
-/* Model */
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--default-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 12px solid white;
+  z-index: 1000;
+}
+
+
+.loading-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 36px;
+}
+
+.enter-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffffff;
+  font-size: 36px;
+  background: var(--default-bg);
+  border: 3px solid white;
+  padding: 8px 20px;
+  opacity: 0;
+}
+
+.enter-button:hover {
+  cursor: pointer;
+  background-color: #fff;
+  color: var(--default-bg);
+}
+
+.instructions {
+  z-index: 1000;
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 26px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+
+
+/* Modal */
+.modal-bg-overlay {
+  z-index: 750;
+  height: 100%;
+  width: 100%;
+  background-color: #31313159;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+
+
 .model{
     z-index: 999;
     position: absolute;
@@ -36,12 +133,13 @@
     max-width: 700px;
     background: linear-gradient(to bottom, #FFE600, #FF8C00); 
     border: 4px solid #fff;
+    border-radius: 16px; 
     letter-spacing: 0.5px;
     color: #000000;
-    /* background-color: var(--default-bg); */
+    background-color: var(--default-bg);
     transition: background 0.4s ease-in;
     transition-delay: 0.1s;
-     font-size: 22px; 
+    font-size: 22px; 
     padding: 20px;
 }
 
@@ -55,11 +153,14 @@
     flex-direction: row;
     justify-content: space-between;
     letter-spacing: 2px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #000000;
+  margin-bottom: 12px;
 }
 
 .model-exit-button {
-    background-color: #1A1A1A;      /* Dark background for contrast */
-    color: #FFE600;                 /* Ki Yellow text color */
+    /* background-color: #1A1A1A;      Dark background for contrast */
+    color: #fff;                 /* Ki Yellow text color */
     border: 2px solid #fff;
     border-radius: 8px;
     padding: 10px 20px;
@@ -74,17 +175,33 @@
     justify-content: center;
     letter-spacing: 2px;
 
+    background: transparent;
+    
+
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .model-exit-button:hover {
-    background-color: #FF8C00;     /* Goku Orange on hover */
+    background-color: #FF8C00;    
     transform: scale(1.05);
 }
+
+
+/* .modal-title {
+  font-size: 100px;
+} */
+
 
 .model-content {
     margin-top: 20px;  /* You can adjust this value as needed */
 }
+
+.modal-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 180px;
+}
+
 
 .model-project-description {
     font-size: 22px;
@@ -116,6 +233,122 @@
 }
 
 .model-project-visit-button:hover {
+    
     background-color: white;
-    color: #1A1A1A;  /* Dark text on white background */
+    color: #1A1A1A;  
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Mobile controls */
+
+.mobile-control {
+  z-index: 500;
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  background: var(--default-bg);
+  height: 64px;
+  width: 64px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid white;
+  padding: 8px;
+  transition: background 0.4s ease-in;
+  transition-delay: 0.1s;
+}
+
+.left-arrow {
+  transform: translate(calc(-100% - 32px), -50%) rotate(270deg);
+}
+
+.right-arrow {
+  transform: translate(32px, -50%) rotate(90deg);
+}
+
+.up-arrow {
+  transform: translate(-50%, calc(-100% - 32px)) rotate(0deg);
+}
+
+.down-arrow {
+  transform: translate(-50%, 32px) rotate(180deg);
+}
+
+
+
+
+/* Toggle Theme Button */
+.theme-mode-toggle-button {
+  z-index: 500;
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  background: var(--default-bg);
+  height: 48px;
+  width: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid white;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.4s ease-in;
+  transition-delay: 0.1s;
+}
+
+/* Toggle Audio Button */
+.audio-toggle-button {
+  z-index: 500;
+  position: absolute;
+  top: 32px;
+  right: 96px;
+  background: var(--default-bg);
+  height: 48px;
+  width: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid white;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.4s ease-in;
+  transition-delay: 0.1s;
+}
+
+.second-icon,
+.second-icon-two {
+  display: none;
+}
+
+
+/* Media Queries */
+
+@media (max-width: 1100px) {
+  .mobile-control {
+    display: flex;
+  }
+}
+
+@media (max-width: 519px) {
+  .enter-button,
+  .instructions {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 396px) {
+  .modal-title {
+    font-size: 26px;
+  }
 }

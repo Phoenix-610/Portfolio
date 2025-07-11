@@ -4,8 +4,53 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Octree } from 'three/addons/math/Octree.js';
 import { Capsule } from 'three/addons/math/Capsule.js';
 
+//Audio with Howler.js
+const sounds = {
+  backgroundMusic: new Howl({
+    src: ["./sfx/music.ogg"],
+    loop: true,
+    volume: 0.3,
+    preload: true,
+  }),
 
+  projectsSFX: new Howl({
+    src: ["./sfx/projects.ogg"],
+    volume: 0.5,
+    preload: true,
+  }),
+
+  pokemonSFX: new Howl({
+    src: ["./sfx/pokemon.ogg"],
+    volume: 0.5,
+    preload: true,
+  }),
+
+  jumpSFX: new Howl({
+    src: ["./sfx/jumpsfx.ogg"],
+    volume: 1.0,
+    preload: true,
+  }),
+};
+
+let touchHappened = false;
+
+let isMuted = false;
+
+function playSound(soundId) {
+  if (!isMuted && sounds[soundId]) {
+    sounds[soundId].play();
+  }
+}
+
+function stopSound(soundId) {
+  if (sounds[soundId]) {
+    sounds[soundId].stop();
+  }
+}
+
+//three.js setup
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xaec972);
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 
@@ -37,8 +82,9 @@ const playerCollider = new Capsule(new THREE.Vector3(0, CAPSULE_RADIUS,0),
                                    CAPSULE_RADIUS );
 
 let playerVelocity = new THREE.Vector3();                                   
-let playerOnFloor = false;                                   
+let playerOnFloor = false;  
 
+// Renderer
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 renderer.setSize( sizes.width, sizes.height );
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -70,12 +116,23 @@ const modelcontent = {
 };
 
 
-
+let isModelOpen = false
 const model = document.querySelector(".model");
+const modelbgOverlay = document.querySelector(".model-bg-overlay");
 const modelTitle = document.querySelector(".model-title");
 const modelProjectDescription = document.querySelector(".model-project-description");
 const modelExitButton = document.querySelector(".model-exit-button");
 const modelProjectVisitButton = document.querySelector(".model-project-visit-button");
+
+const themeToggleButton = document.querySelector(".theme-mode-toggle-button");
+const firstIcon = document.querySelector(".first-icon");
+const secondIcon = document.querySelector(".second-icon");
+
+const audioToggleButton = document.querySelector(".audio-toggle-button");
+const firstIconTwo = document.querySelector(".first-icon-two");
+const secondIconTwo = document.querySelector(".second-icon-two");
+
+
 
 function showModel(id){
     const content = modelcontent[id];
@@ -90,11 +147,18 @@ function showModel(id){
             modelProjectVisitButton.classList.add("hidden");
         }    
         model.classList.remove("hidden");
+        modelbgOverlay.classList.remove("hidden");
+        isModelOpen = true;
     }    
 }
 
-function hideModel(){
-    model.classList.add("hidden");
+function hideModel() {
+  isModelOpen = false;
+  model.classList.add("hidden");
+  modelbgOverlay.classList.add("hidden");
+  if (!isMuted) {
+    playSound("projectsSFX");
+  }
 }
 
 
@@ -115,7 +179,54 @@ const intersectObjectsNames = [
       "Baby_Goku_Super_Saiyan_III",
 ];
 
-const loader = new GLTFLoader();
+
+
+// Loading screen and loading manager
+// See: https://threejs.org/docs/#api/en/loaders/managers/LoadingManager
+const loadingScreen = document.getElementById("loadingScreen");
+const loadingText = document.querySelector(".loading-text");
+const enterButton = document.querySelector(".enter-button");
+const instructions = document.querySelector(".instructions");
+
+const manager = new THREE.LoadingManager();
+
+manager.onLoad = function () {
+  const t1 = gsap.timeline();
+
+  t1.to(loadingText, {
+    opacity: 0,
+    duration: 0,
+  });
+
+  t1.to(enterButton, {
+    opacity: 1,
+    duration: 0,
+  });
+};
+
+enterButton.addEventListener("click", () => {
+  gsap.to(loadingScreen, {
+    opacity: 0,
+    duration: 0,
+  });
+  gsap.to(instructions, {
+    opacity: 0,
+    duration: 0,
+    onComplete: () => {
+      loadingScreen.remove();
+    },
+  });
+
+  if (!isMuted) {
+    playSound("projectsSFX");
+    playSound("backgroundMusic");
+  }
+});
+
+
+
+const loader = new GLTFLoader(manager);
+
 loader.load( './Portfolio.glb', function ( glb ) {
    glb.scene.traverse((child) => {
      if(intersectObjectsNames.includes(child.name)) {
@@ -146,6 +257,8 @@ loader.load( './Portfolio.glb', function ( glb ) {
   console.error( error );
 } );
 
+
+// Lights
 const light = new THREE.AmbientLight( 0x404040, 4); // soft white light
 scene.add( light );
 
@@ -159,13 +272,16 @@ sun.shadow.camera.right = 200;
 sun.shadow.camera.top = 200;
 sun.shadow.camera.bottom = -200;
 sun.shadow.normalBias = 0.5; // Adjust to reduce shadow acne
-scene.add( sun );
+scene.add(sun.target);
+scene.add(sun);
 
 // const shadowHelper = new THREE.CameraHelper( sun.shadow.camera );
 // scene.add( shadowHelper )
 // // const helper = new THREE.DirectionalLightHelper( sun, 5 );
 // // scene.add( helper );
 
+
+// Camera setup
 const aspect = sizes.width / sizes.height;
 const camera = new THREE.OrthographicCamera( -aspect*50, aspect*50, 50, -50, -1000, 1000 );
 const DEFAULT_ZOOM = 2;
@@ -178,8 +294,10 @@ camera.updateProjectionMatrix();
 const cameraOffset = new THREE.Vector3(50, 50, 50);
 
 
-// const controls = new OrbitControls( camera, canvas );
-// controls.update();
+const controls = new OrbitControls( camera, canvas );
+controls.minZoom = 1;    // Prevents zooming out beyond this level
+controls.maxZoom = 3;    // Limits maximum zoom in
+controls.update();
 
 
 function onResize(){
@@ -274,13 +392,27 @@ function jumpCharacter(meshID) {
 function onPointerMove( event ) {
 	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  touchHappened = false;
+}
+
+function onTouchEnd(event) {
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  touchHappened = true;
+  onClick();
 }
 
 function onClick(){
-    console.log("Clicked on: ", intersectedObject);
+  //  console.log("Clicked on: ", intersectedObject);
+   if(touchHappened) return;
+
    if(intersectedObject !== ""){ 
         if(["Baby_Goku_Super_Saiyan","Baby_Goku_Halloween","Baby_Goku_Super_Saiyan_III","Baby_Goku_Super_Saiyan_IV"].includes(intersectedObject)){
-            jumpCharacter(intersectedObject);
+          if( !isMuted)  {
+            playSound("pokemonSFX");
+          }
+          jumpCharacter(intersectedObject);
         }else{   
             showModel(intersectedObject);  
         }    
@@ -432,11 +564,176 @@ function onKeydown(event){
 
 
 
+
+// Toggle Theme Function
+function toggleTheme() {
+  if (!isMuted) {
+    playSound("projectsSFX");
+  }
+  const isDarkTheme = document.body.classList.contains("dark-theme");
+  document.body.classList.toggle("dark-theme");
+  document.body.classList.toggle("light-theme");
+
+  if (firstIcon.style.display === "none") {
+    firstIcon.style.display = "block";
+    secondIcon.style.display = "none";
+  } else {
+    firstIcon.style.display = "none";
+    secondIcon.style.display = "block";
+  }
+
+  gsap.to(light.color, {
+    r: isDarkTheme ? 1.0 : 0.25,
+    g: isDarkTheme ? 1.0 : 0.31,
+    b: isDarkTheme ? 1.0 : 0.78,
+    duration: 1,
+    ease: "power2.inOut",
+  });
+
+  gsap.to(light, {
+    intensity: isDarkTheme ? 0.8 : 0.9,
+    duration: 1,
+    ease: "power2.inOut",
+  });
+
+  gsap.to(sun, {
+    intensity: isDarkTheme ? 1 : 0.8,
+    duration: 1,
+    ease: "power2.inOut",
+  });
+
+  gsap.to(sun.color, {
+    r: isDarkTheme ? 1.0 : 0.25,
+    g: isDarkTheme ? 1.0 : 0.41,
+    b: isDarkTheme ? 1.0 : 0.88,
+    duration: 1,
+    ease: "power2.inOut",
+  });
+}
+
+// Toggle Audio Function
+function toggleAudio() {
+  if (!isMuted) {
+    playSound("projectsSFX");
+  }
+  if (firstIconTwo.style.display === "none") {
+    firstIconTwo.style.display = "block";
+    secondIconTwo.style.display = "none";
+    isMuted = false;
+    sounds.backgroundMusic.play();
+  } else {
+    firstIconTwo.style.display = "none";
+    secondIconTwo.style.display = "block";
+    isMuted = true;
+    sounds.backgroundMusic.pause();
+  }
+}
+
+// Mobile controls
+const mobileControls = {
+  up: document.querySelector(".mobile-control.up-arrow"),
+  left: document.querySelector(".mobile-control.left-arrow"),
+  right: document.querySelector(".mobile-control.right-arrow"),
+  down: document.querySelector(".mobile-control.down-arrow"),
+};
+
+const pressedButtons = {
+  up: false,
+  left: false,
+  right: false,
+  down: false,
+};
+
+function handleJumpAnimation() {
+  if (!character.instance || !character.isMoving) return;
+
+  const jumpDuration = 0.5;
+  const jumpHeight = 2;
+
+  const t1 = gsap.timeline();
+
+  t1.to(character.instance.scale, {
+    x: 1.08,
+    y: 0.9,
+    z: 1.08,
+    duration: jumpDuration * 0.2,
+    ease: "power2.out",
+  });
+
+  t1.to(character.instance.scale, {
+    x: 0.92,
+    y: 1.1,
+    z: 0.92,
+    duration: jumpDuration * 0.3,
+    ease: "power2.out",
+  });
+
+  t1.to(character.instance.scale, {
+    x: 1,
+    y: 1,
+    z: 1,
+    duration: jumpDuration * 0.3,
+    ease: "power1.inOut",
+  });
+
+  t1.to(character.instance.scale, {
+    x: 1,
+    y: 1,
+    z: 1,
+    duration: jumpDuration * 0.2,
+  });
+}
+
+
+Object.entries(mobileControls).forEach(([direction, element]) => {
+  element.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    pressedButtons[direction] = true;
+  });
+
+  element.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    pressedButtons[direction] = false;
+  });
+
+  element.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    pressedButtons[direction] = true;
+  });
+
+  element.addEventListener("mouseup", (e) => {
+    e.preventDefault();
+    pressedButtons[direction] = false;
+  });
+
+  element.addEventListener("mouseleave", (e) => {
+    pressedButtons[direction] = false;
+  });
+
+  element.addEventListener("touchcancel", (e) => {
+    pressedButtons[direction] = false;
+  });
+});
+
+window.addEventListener("blur", () => {
+  Object.keys(pressedButtons).forEach((key) => {
+    pressedButtons[key] = false;
+  });
+});
+
+
+
 modelExitButton.addEventListener("click", hideModel);
+modelbgOverlay.addEventListener("click", hideModel);
+themeToggleButton.addEventListener("click", toggleTheme);
+audioToggleButton.addEventListener("click", toggleAudio);
+window.addEventListener("touchend", onTouchEnd, { passive: false });
 window.addEventListener("resize", onResize); 
 window.addEventListener("click", onClick); 
 window.addEventListener( 'pointermove', onPointerMove );
 window.addEventListener( 'keydown', onKeydown );
+
+
 
 function animate() { 
   // console.log(camera.position);
@@ -476,5 +773,4 @@ function animate() {
 }
 
 renderer.setAnimationLoop( animate );
-
 
