@@ -17,7 +17,6 @@ Welcome to my personal portfolio website, creatively themed around **Minecraft**
 <!-- Replace the path below with your actual image path or URL -->
 ![Portfolio Screenshot](./media/preview.png)
 
-> Add a screenshot in `./media/preview.png` or update the path if you use a different image location.
 
 ## 🛠️ Built With
 
