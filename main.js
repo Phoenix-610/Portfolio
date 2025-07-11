@@ -314,9 +314,10 @@ function onResize(){
 }
 
 
+let isCharacterReady = true;
 
 function jumpCharacter(meshID) {
- // if (!isCharacterReady) return;
+  if (!isCharacterReady) return;
 
   const mesh = scene.getObjectByName(meshID);
   const jumpHeight = 2;
@@ -370,9 +371,9 @@ function jumpCharacter(meshID) {
       y: mesh.position.y,
       duration: jumpDuration * 0.5,
       ease: "bounce.out",
-    //   onComplete: () => {
-    //     isCharacterReady = true;
-    //   },
+      onComplete: () => {
+        isCharacterReady = true;
+      },
     },
     ">"
   );
@@ -389,9 +390,9 @@ function jumpCharacter(meshID) {
 
 
 
-function onPointerMove( event ) {
-	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+function onMouseMove(event) {
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
   touchHappened = false;
 }
 
@@ -400,24 +401,75 @@ function onTouchEnd(event) {
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
   touchHappened = true;
-  onClick();
+  handleInteraction();
 }
 
-function onClick(){
-  //  console.log("Clicked on: ", intersectedObject);
-   if(touchHappened) return;
 
-   if(intersectedObject !== ""){ 
-        if(["Baby_Goku_Super_Saiyan","Baby_Goku_Halloween","Baby_Goku_Super_Saiyan_III","Baby_Goku_Super_Saiyan_IV"].includes(intersectedObject)){
-          if( !isMuted)  {
-            playSound("pokemonSFX");
-          }
-          jumpCharacter(intersectedObject);
-        }else{   
-            showModel(intersectedObject);  
-        }    
+
+
+function onClick() {
+  if (touchHappened) return;
+  handleInteraction();
+}
+
+
+
+function handleInteraction() {
+  if (!model.classList.contains("hidden")) {
+    return;
+  }
+
+  raycaster.setFromCamera(pointer, camera);
+  const intersects = raycaster.intersectObjects(intersectObjects);
+
+  if (intersects.length > 0) {
+    intersectedObject = intersects[0].object.name;
+  } else {
+    intersectedObject = "";
+  }
+
+  if (intersectedObject !== "") {
+    if (
+      [
+        "Baby_Goku_Super_Saiyan",
+        "Baby_Goku_Halloween",
+        "Baby_Goku_Super_Saiyan_III",
+        "Baby_Goku_Super_Saiyan_IV",
+      ].includes(intersectedObject)
+    ) {
+      if (isCharacterReady) {
+        if (!isMuted) {
+          playSound("pokemonSFX");
+        }
+        jumpCharacter(intersectedObject);
+        isCharacterReady = false;
+      }
+    } else {
+      if (intersectedObject) {
+        showModel(intersectedObject);
+        if (!isMuted) {
+          playSound("projectsSFX");
+        }
+      }
     }
+  }
 }
+
+// function onClick(){
+//   //  console.log("Clicked on: ", intersectedObject);
+//    if(touchHappened) return;
+
+//    if(intersectedObject !== ""){ 
+//         if(["Baby_Goku_Super_Saiyan","Baby_Goku_Halloween","Baby_Goku_Super_Saiyan_III","Baby_Goku_Super_Saiyan_IV"].includes(intersectedObject)){
+//           if( !isMuted)  {
+//             playSound("pokemonSFX");
+//           }
+//           jumpCharacter(intersectedObject);
+//         }else{   
+//             showModel(intersectedObject);  
+//         }    
+//     }
+// }
 
 
 function moveCharacter(targetPosition, targetRotation) {
@@ -524,48 +576,99 @@ function updatePlayer(){
 
 }
 
-function onKeydown(event){
-  //  console.log(event);
+// function onKeydown(event){
+//   //  console.log(event);
 
-    if (event.code.toLowerCase() === "keyr") {
-    respawnCharacter();
-    return;
-    }
+//     if (event.code.toLowerCase() === "keyr") {
+//     respawnCharacter();
+//     return;
+//     }
 
-    if( character.isMoving) return;
+//     if( character.isMoving) return;
 
-    switch(event.key.toLowerCase()){
-        case "w":
-        case "arrowup":
-            playerVelocity.z -= MOVE_SPEED;
-            targetRotation = -Math.PI;
-        break;
-         case "s":
-        case "arrowdown":
-            playerVelocity.z += MOVE_SPEED;
-            targetRotation = 0;
-        break;
-         case "a":
-        case "arrowleft":
-            playerVelocity.x -= MOVE_SPEED;
-            targetRotation = -Math.PI/2;
-        break;
-         case "d":
-        case "arrowright":
-            playerVelocity.x += MOVE_SPEED;
-            targetRotation = Math.PI/2;
-        break;
-        default:
-            return;
-    }
-    playerVelocity.y = JUMP_HEIGHT;  
-    character.isMoving = true; 
-}
+//     switch(event.key.toLowerCase()){
+//         case "w":
+//         case "arrowup":
+//             playerVelocity.z -= MOVE_SPEED;
+//             targetRotation = -Math.PI;
+//         break;
+//          case "s":
+//         case "arrowdown":
+//             playerVelocity.z += MOVE_SPEED;
+//             targetRotation = 0;
+//         break;
+//          case "a":
+//         case "arrowleft":
+//             playerVelocity.x -= MOVE_SPEED;
+//             targetRotation = -Math.PI/2;
+//         break;
+//          case "d":
+//         case "arrowright":
+//             playerVelocity.x += MOVE_SPEED;
+//             targetRotation = Math.PI/2;
+//         break;
+//         default:
+//             return;
+//     }
+//     playerVelocity.y = JUMP_HEIGHT;  
+//     character.isMoving = true; 
+// }
 
 
 
 
 // Toggle Theme Function
+
+
+function onKeyDown(event) {
+  if (event.code.toLowerCase() === "keyr") {
+    respawnCharacter();
+    return;
+  }
+
+  switch (event.code.toLowerCase()) {
+    case "keyw":
+    case "arrowup":
+      pressedButtons.up = true;
+      break;
+    case "keys":
+    case "arrowdown":
+      pressedButtons.down = true;
+      break;
+    case "keya":
+    case "arrowleft":
+      pressedButtons.left = true;
+      break;
+    case "keyd":
+    case "arrowright":
+      pressedButtons.right = true;
+      break;
+  }
+}
+
+function onKeyUp(event) {
+  switch (event.code.toLowerCase()) {
+    case "keyw":
+    case "arrowup":
+      pressedButtons.up = false;
+      break;
+    case "keys":
+    case "arrowdown":
+      pressedButtons.down = false;
+      break;
+    case "keya":
+    case "arrowleft":
+      pressedButtons.left = false;
+      break;
+    case "keyd":
+    case "arrowright":
+      pressedButtons.right = false;
+      break;
+  }
+}
+
+
+
 function toggleTheme() {
   if (!isMuted) {
     playSound("projectsSFX");
@@ -685,6 +788,40 @@ function handleJumpAnimation() {
 }
 
 
+function handleContinuousMovement() {
+  if (!character.instance) return;
+
+  if (
+    Object.values(pressedButtons).some((pressed) => pressed) &&
+    !character.isMoving
+  ) {
+    if (!isMuted) {
+      playSound("jumpSFX");
+    }
+    if (pressedButtons.up) {
+      playerVelocity.z -= MOVE_SPEED;
+      targetRotation = -Math.PI;
+    }
+    if (pressedButtons.down) {
+      playerVelocity.z += MOVE_SPEED;
+      targetRotation = 0;
+    }
+    if (pressedButtons.left) {
+      playerVelocity.x -= MOVE_SPEED;
+      targetRotation = -Math.PI / 2;
+    }
+    if (pressedButtons.right) {
+      playerVelocity.x += MOVE_SPEED;
+      targetRotation = Math.PI / 2;
+    }
+
+    playerVelocity.y = JUMP_HEIGHT;
+    character.isMoving = true;
+    handleJumpAnimation();
+  }
+}
+
+
 Object.entries(mobileControls).forEach(([direction, element]) => {
   element.addEventListener("touchstart", (e) => {
     e.preventDefault();
@@ -727,11 +864,12 @@ modelExitButton.addEventListener("click", hideModel);
 modelbgOverlay.addEventListener("click", hideModel);
 themeToggleButton.addEventListener("click", toggleTheme);
 audioToggleButton.addEventListener("click", toggleAudio);
+window.addEventListener("resize", onResize);
+window.addEventListener("click", onClick, { passive: false });
+window.addEventListener("mousemove", onMouseMove);
 window.addEventListener("touchend", onTouchEnd, { passive: false });
-window.addEventListener("resize", onResize); 
-window.addEventListener("click", onClick); 
-window.addEventListener( 'pointermove', onPointerMove );
-window.addEventListener( 'keydown', onKeydown );
+window.addEventListener("keydown", onKeyDown);
+window.addEventListener("keyup", onKeyUp);
 
 
 
@@ -739,6 +877,7 @@ function animate() {
   // console.log(camera.position);
     
     updatePlayer();
+    handleContinuousMovement();
     
     if(character.instance){
             
