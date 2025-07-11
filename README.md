@@ -20,7 +20,6 @@ Welcome to my personal portfolio website built with modern web technologies to s
 - **Three.js** – for stunning 3D visuals  
 - **GSAP** – for smooth animations  
 - **HTML / CSS / JavaScript** – for structure and interactivity  
-- **Vite / Webpack** (if used) – for lightning-fast builds  
 - **Responsive Design** – works across devices  
 
 ## 📁 Features
@@ -28,7 +27,7 @@ Welcome to my personal portfolio website built with modern web technologies to s
 - Interactive 3D sections  
 - Smooth transitions and animated content  
 - Project showcase with descriptions  
-- About, contact, and resume sections
+- About Me
 
 
 
