@@ -5,6 +5,7 @@ Welcome to my personal portfolio website built with modern web technologies to s
 ## 🚀 Live Demo
 
 🔗 [Click here to view the live site](https://phoenix-610.github.io/Portfolio/)
+
 🔗 [Click here to view the live site](https://portfolio-cuks13gwr-phoenixs-projects-8611d26f.vercel.app/)
 
 ## 📸 Preview
@@ -12,14 +13,13 @@ Welcome to my personal portfolio website built with modern web technologies to s
 <!-- Replace the path below with your actual image path or URL -->
 ![Portfolio Screenshot](./media/preview.png)
 
-> Tip: Add a `preview.png` image to your repo root to display it here.
+
 
 ## 🛠️ Built With
 
 - **Three.js** – for stunning 3D visuals  
 - **GSAP** – for smooth animations  
 - **HTML / CSS / JavaScript** – for structure and interactivity  
-- **Vite / Webpack** (if used) – for lightning-fast builds  
 - **Responsive Design** – works across devices  
 
 ## 📁 Features
@@ -27,7 +27,7 @@ Welcome to my personal portfolio website built with modern web technologies to s
 - Interactive 3D sections  
 - Smooth transitions and animated content  
 - Project showcase with descriptions  
-- About, contact, and resume sections
+- About Me
 
 
 
